@@ -17,9 +17,7 @@ public class Formatter {
         }
         while(
             counter < chars.length &&
-            chars[counter] != ' ' &&
-            chars[counter] != '/' &&
-            chars[counter] != '\r') {
+            chars[counter] != '/') {
                 formatted = formatted + chars[counter];
                 counter++;
             }

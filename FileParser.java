@@ -53,7 +53,6 @@ public class FileParser {
                 e.printStackTrace();
             }
         });
-        
         br.close();
         bw.close();
     }
@@ -71,7 +70,6 @@ public class FileParser {
             } else if(filePath.isFile()) {
                 Boolean isValidFileType = this.validateFileType(path);
                 if(isValidFileType) {
-                    System.out.println(path);
                     String outputFilePath = this.getHackFilePath(path);
                     BufferedReader br = this.getBufferedReader(path);
                     BufferedWriter bw = this.getBufferedWriter(outputFilePath);
