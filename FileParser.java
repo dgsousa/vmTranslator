@@ -36,7 +36,7 @@ public class FileParser {
 
     public void translateFile(BufferedReader br, BufferedWriter bw) throws Exception {
         Formatter formatter = new Formatter();
-        // Translator translator = new Translator();
+        Translator translator = new Translator();
         String st;
         ArrayList<String> contents = new ArrayList<String>();
         
@@ -45,8 +45,8 @@ public class FileParser {
         }
         
         List<String> formattedContents = formatter.format(contents);
-        // List<String> binaryContents = translator.translate(formattedContents);
-        formattedContents.forEach(line -> {
+        List<String> assemblyCode = translator.translate(formattedContents);
+        assemblyCode.forEach(line -> {
             try {
                 bw.write(line + "\n");
             } catch(IOException e) {
@@ -74,7 +74,7 @@ public class FileParser {
                     BufferedReader br = this.getBufferedReader(path);
                     BufferedWriter bw = this.getBufferedWriter(outputFilePath);
                     this.translateFile(br, bw);
-                }  
+                }
             }
         }
     }
