@@ -7,6 +7,7 @@ public class FileParser {
     String path;
     String inputExt = "vm";
     String outputExt = "asm";
+    BufferedWriter bw;
 
     public Boolean validateFileType(String path) {
         String[] fileNameArr = path.split("\\.");
@@ -14,10 +15,16 @@ public class FileParser {
         return ext.equals(this.inputExt);
     }
 
-    public String getHackFilePath(String path) {
-        String[] fileNameArr = path.split("\\.");
-        fileNameArr[fileNameArr.length - 1] = this.outputExt;
-        return String.join(".", fileNameArr);
+    public String getAssemblyFilePath(String path) {
+        String[] fileNameArr = path.split("\\/");
+        String AssemblyFileName = fileNameArr[fileNameArr.length - 1] + "." + this.outputExt;
+        return String.join("/", fileNameArr) + "/" + AssemblyFileName;
+    }
+
+    public String getShortFileName(String path) {
+        String[] fileNameArr = path.split("\\/");
+        String[] fileNameArr2 = fileNameArr[fileNameArr.length - 1].split("\\.");
+        return fileNameArr2[0];
     }
 
     public BufferedReader getBufferedReader(String path) throws Exception {
@@ -34,9 +41,9 @@ public class FileParser {
         return br;
     }
 
-    public void translateFile(BufferedReader br, BufferedWriter bw) throws Exception {
+    public void translateFile(BufferedReader br, String fileName) throws Exception {
         Formatter formatter = new Formatter();
-        Translator translator = new Translator();
+        Translator translator = new Translator(fileName);
         String st;
         ArrayList<String> contents = new ArrayList<String>();
         
@@ -54,7 +61,17 @@ public class FileParser {
             }
         });
         br.close();
-        bw.close();
+    }
+
+    public void writeBootstrapCode() {
+        List<String> bootstrapCode = Translator.getBootstrapCode();
+        bootstrapCode.forEach(line -> {
+            try {
+                bw.write(line + "\n");
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void recurseThroughFiles(String args[]) throws Exception {
@@ -70,16 +87,19 @@ public class FileParser {
             } else if(filePath.isFile()) {
                 Boolean isValidFileType = this.validateFileType(path);
                 if(isValidFileType) {
-                    String outputFilePath = this.getHackFilePath(path);
+                    String fileName = this.getShortFileName(path);
                     BufferedReader br = this.getBufferedReader(path);
-                    BufferedWriter bw = this.getBufferedWriter(outputFilePath);
-                    this.translateFile(br, bw);
+                    this.translateFile(br, fileName);
                 }
             }
         }
     }
 
     public FileParser(String args[]) throws Exception {
+        String AssemblyFilePath = this.getAssemblyFilePath(args[0]);
+        bw = this.getBufferedWriter(AssemblyFilePath);
+        this.writeBootstrapCode();
         this.recurseThroughFiles(args);
+        bw.close();
     }
 }
